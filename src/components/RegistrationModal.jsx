@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, CheckCircle2, Shield, Copy, Check, Download, Users, ArrowRight, Sparkles } from 'lucide-react'
+import { sfx } from '../utils/audio'
 
 export default function RegistrationModal({ isOpen, onClose }) {
   const [existingReg, setExistingReg] = useState(null)
@@ -59,7 +60,10 @@ export default function RegistrationModal({ isOpen, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!validate()) return
+    if (!validate()) {
+      sfx.playError()
+      return
+    }
 
     setSubmitting(true)
     setTimeout(() => {
@@ -76,6 +80,7 @@ export default function RegistrationModal({ isOpen, onClose }) {
       }
       setExistingReg(registration)
       setSubmitting(false)
+      sfx.playSuccess()
     }, 600)
   }
 

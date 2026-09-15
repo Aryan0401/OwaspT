@@ -5,6 +5,7 @@ import SoulCursor from './components/SoulCursor'
 import RulesModal from './components/RulesModal'
 import RegistrationModal from './components/RegistrationModal'
 import { useScrollReveal } from './hooks/useScrollReveal'
+import { sfx } from './utils/audio'
 
 // Lazy-load below-the-fold content
 const About      = lazy(() => import('./components/About'))
@@ -79,6 +80,39 @@ export default function App() {
       window.history.replaceState(null, '', window.location.pathname)
     }
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+
+    let lastHovered = null
+
+    const handleClick = (e) => {
+      const target = e.target.closest('button, a, [role="button"], .soul-shard-card, .timeline-event, .stat, .prize-card')
+      if (target) {
+        sfx.playClick()
+      }
+    }
+
+    const handlePointerOver = (e) => {
+      const target = e.target.closest('button, a, [role="button"], .soul-shard-card, .timeline-filter-btn, .prize-card, .stat, .sponsor-card')
+      if (target && target !== lastHovered) {
+        lastHovered = target
+        sfx.playHover()
+      }
+    }
+
+    const handlePointerOut = (e) => {
+      if (lastHovered && !e.target.closest('button, a, [role="button"], .soul-shard-card, .timeline-filter-btn, .prize-card, .stat, .sponsor-card')) {
+        lastHovered = null
+      }
+    }
+
+    window.addEventListener('click', handleClick, { passive: true })
+    window.addEventListener('pointerover', handlePointerOver, { passive: true })
+    window.addEventListener('pointerout', handlePointerOut, { passive: true })
+
+    return () => {
+      window.removeEventListener('click', handleClick)
+      window.removeEventListener('pointerover', handlePointerOver)
+      window.removeEventListener('pointerout', handlePointerOut)
+    }
   }, [])
 
   const handleOpenRegister = () => setRegisterOpen(true)

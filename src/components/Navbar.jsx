@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Menu, X, ArrowUpRight } from 'lucide-react'
+import { Menu, X, ArrowUpRight, Volume2, VolumeX } from 'lucide-react'
+import { sfx } from '../utils/audio'
 
 export default function Navbar({ onOpenRegister, onOpenRules }) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
+  const [muted, setMuted] = useState(() => sfx.isMuted())
 
   const leftNavLinks = [
     { id: 'about', label: 'About', index: '01' },
@@ -49,6 +51,15 @@ export default function Navbar({ onOpenRegister, onOpenRules }) {
     }
   }
 
+  const toggleSound = () => {
+    const next = !muted
+    setMuted(next)
+    sfx.setMuted(next)
+    if (!next) {
+      sfx.playSuccess()
+    }
+  }
+
   return (
     <>
       {/* Top Main Navbar */}
@@ -64,6 +75,28 @@ export default function Navbar({ onOpenRegister, onOpenRules }) {
         </button>
 
         <div className="nav-actions">
+          {/* Audio FX Toggle */}
+          <button
+            className={`nav-audio-btn ${muted ? 'nav-audio-btn--muted' : ''}`}
+            onClick={toggleSound}
+            aria-label={muted ? 'Enable sound effects' : 'Mute sound effects'}
+            title={muted ? 'Enable Cyber SFX' : 'Mute Cyber SFX'}
+          >
+            {muted ? (
+              <VolumeX size={15} />
+            ) : (
+              <>
+                <Volume2 size={15} />
+                <span className="audio-bars" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              </>
+            )}
+            <span className="audio-label">{muted ? 'SFX: OFF' : 'SFX: ON'}</span>
+          </button>
+
           <span className="nav-ember-wrap">
             <button
               className="nav-register"
