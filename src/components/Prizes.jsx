@@ -1,4 +1,5 @@
-import { Trophy, Medal, Award, Gift, Shirt, Star, Users, Crown, Gem, Sparkles } from 'lucide-react'
+import { Trophy, Gift, Shirt, Star, Users, Crown, Gem, Sparkles } from 'lucide-react'
+import PrizeCharacter3D from './PrizeCharacter3D'
 
 const medals = [
   {
@@ -7,7 +8,9 @@ const medals = [
     title: 'RUNNER UP',
     tag: 'THE SECOND TO AWAKEN',
     cash: '₹25,000',
-    icon: Medal,
+    character: 'gamora',
+    characterTitle: 'GAMORA',
+    characterRole: 'THE GODSLAYER',
     footerText: 'SOLVE · LEARN · RECLAIM',
     perks: [
       { text: '6-Month HTB VIP Vouchers', icon: Gift },
@@ -22,7 +25,9 @@ const medals = [
     title: 'CHAMPION',
     tag: 'THE APEX RECLAIMER',
     cash: '₹35,000',
-    icon: Crown,
+    character: 'thanos',
+    characterTitle: 'THANOS',
+    characterRole: 'THE SOUL STONE BEARER',
     footerText: 'LEGENDS · SOLVE · RECLAIM',
     perks: [
       { text: '1-Year HTB VIP+ Subscriptions', icon: Crown },
@@ -37,7 +42,9 @@ const medals = [
     title: 'THIRD PLACE',
     tag: 'THE FINAL ASCENT',
     cash: '₹15,000',
-    icon: Award,
+    character: 'redskull',
+    characterTitle: 'RED SKULL',
+    characterRole: 'THE VORMIR KEEPER',
     footerText: 'PERSIST · SOLVE · RISE',
     perks: [
       { text: '3-Month HTB VIP Vouchers', icon: Gift },
@@ -61,7 +68,6 @@ export default function Prizes() {
 
       <div className="prize-grid">
         {medals.map((medal) => {
-          const IconComponent = medal.icon
           const isChampion = medal.place === '01'
 
           return (
@@ -80,16 +86,13 @@ export default function Prizes() {
                 </span>
               </div>
 
-              {/* High-Tech Cyber Trophy Emblem */}
-              <div className={`prize-emblem-wrap prize-emblem--${medal.tier.toLowerCase()}`}>
-                <div className="prize-emblem-line" />
-                <div className="prize-emblem-glow" aria-hidden="true" />
-                <div className="prize-emblem-ring">
-                  <div className="prize-emblem-inner">
-                    <IconComponent size={isChampion ? 40 : 34} />
-                  </div>
+              <div className="prize-character-frame">
+                <div className="prize-character-copy" aria-hidden="true">
+                  <span>{medal.characterTitle}</span>
+                  <small>{medal.characterRole}</small>
                 </div>
-                <div className="prize-emblem-line" />
+                <PrizeCharacter3D character={medal.character} />
+                <span className="prize-character-scanline" aria-hidden="true" />
               </div>
 
               <h3>{medal.title}</h3>

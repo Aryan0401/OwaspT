@@ -1373,6 +1373,53 @@ h1, h2, h3, p { margin: 0; } h1, h2, h3 { font-family: Rajdhani, sans-serif; }
 .prize-tier-badge--silver { color: #cbd5e1; border: 1px solid #cbd5e1; }
 .prize-tier-badge--bronze { color: #fdba74; border: 1px solid #fdba74; }
 
+/* Interactive character relics. The WebGL canvas stays contained so the rest of
+   the card retains its familiar information hierarchy and click behaviour. */
+.prize-character-frame {
+  isolation: isolate;
+  position: relative;
+  height: 218px;
+  margin: -10px -14px 12px;
+  overflow: hidden;
+  border-top: 1px solid rgba(255,255,255,.09);
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(255, 141, 52, .15), transparent 56%),
+    linear-gradient(135deg, rgba(255,255,255,.035), transparent 38%);
+}
+.prize-character-frame::before,
+.prize-character-frame::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+.prize-character-frame::before {
+  inset: 8px;
+  border: 1px solid rgba(255,255,255,.12);
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+}
+.prize-character-frame::after {
+  width: 46%;
+  height: 1px;
+  bottom: 18px;
+  left: 27%;
+  background: currentColor;
+  box-shadow: 0 0 16px currentColor;
+  opacity: .55;
+}
+.prize-card--1 .prize-character-frame { color: #ffc34a; background: radial-gradient(ellipse at 50% 45%, rgba(255, 152, 8, .26), transparent 58%), linear-gradient(135deg, rgba(255,219,128,.07), transparent 42%); }
+.prize-card--2 .prize-character-frame { color: #73e5b4; background: radial-gradient(ellipse at 50% 45%, rgba(16, 185, 129, .23), transparent 58%), linear-gradient(135deg, rgba(167,243,208,.06), transparent 42%); }
+.prize-card--3 .prize-character-frame { color: #ff6666; background: radial-gradient(ellipse at 50% 45%, rgba(239, 68, 68, .25), transparent 58%), linear-gradient(135deg, rgba(254,202,202,.05), transparent 42%); }
+.prize-3d-stage { position: absolute; inset: 0; z-index: 1; cursor: crosshair; touch-action: none; }
+.prize-3d-stage canvas { display: block; width: 100% !important; height: 100% !important; }
+.prize-character-copy { position: absolute; z-index: 3; top: 16px; left: 20px; display: grid; gap: 2px; pointer-events: none; text-align: left; color: currentColor; font-family: 'DM Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
+.prize-character-copy span { font-size: 10px; font-weight: 700; text-shadow: 0 0 12px currentColor; }
+.prize-character-copy small { color: rgba(239,232,224,.64); font-size: 6.5px; letter-spacing: .1em; }
+.prize-character-scanline { position: absolute; z-index: 3; inset: 0; pointer-events: none; opacity: .22; background: repeating-linear-gradient(0deg, transparent 0 4px, rgba(255,255,255,.12) 5px); mix-blend-mode: overlay; }
+.prize-card:hover { transform: translateY(-7px); }
+.prize-card--1:hover { transform: scale(1.05) translateY(-7px); box-shadow: 0 0 42px rgba(255, 170, 50, .32), inset 0 0 30px rgba(255, 170, 50, .18); }
+
 .prize-emblem-wrap {
   position: relative;
   display: flex;
@@ -1505,6 +1552,12 @@ h1, h2, h3, p { margin: 0; } h1, h2, h3 { font-family: Rajdhani, sans-serif; }
     min-height: auto;
     order: -1;
   }
+  .prize-character-frame { height: 235px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prize-card, .prize-card--1 { transition: none; }
+  .prize-card:hover, .prize-card--1:hover { transform: none; }
 }
 
 
