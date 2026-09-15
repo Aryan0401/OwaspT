@@ -1,16 +1,17 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import anime from 'animejs/lib/anime.es.js'
-import { ArrowDown, ArrowUpRight, Mouse, Rotate3D } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import MagicRings from './MagicRings'
 
 const SoulStoneScene = lazy(() => import('./SoulStoneScene'))
-const EVENT_DATE = '[PLACEHOLDER_EVENT_DATE]'
-const placeholderTime = { days: '28', hours: '14', minutes: '32', seconds: '17' }
+// Event Date: October 10, 2026 10:00:00 IST
+const EVENT_DATE = '2026-10-10T10:00:00+05:30'
 
 function getTimeLeft() {
-  if (EVENT_DATE.startsWith('[')) return placeholderTime
   const difference = new Date(EVENT_DATE).getTime() - Date.now()
-  if (Number.isNaN(difference) || difference <= 0) return { days: '00', hours: '00', minutes: '00', seconds: '00' }
+  if (Number.isNaN(difference) || difference <= 0) {
+    return { days: '00', hours: '00', minutes: '00', seconds: '00' }
+  }
   return {
     days: String(Math.floor(difference / 86400000)).padStart(2, '0'),
     hours: String(Math.floor((difference / 3600000) % 24)).padStart(2, '0'),
@@ -31,13 +32,21 @@ function MagneticButton({ children, className = '', onClick }) {
   return <button className={`button-magnetic ${className}`} onClick={onClick} onMouseMove={onMove} onMouseLeave={onLeave}>{children}</button>
 }
 
-export default function Hero() {
+export default function Hero({ onOpenRegister, onOpenRules }) {
   const [time, setTime] = useState(getTimeLeft)
   useEffect(() => {
     const interval = window.setInterval(() => setTime(getTimeLeft()), 1000)
     return () => window.clearInterval(interval)
   }, [])
-  const scrollToRegister = () => document.querySelector('#register')?.scrollIntoView({ behavior: 'smooth' })
+
+  const handleRegisterClick = () => {
+    if (onOpenRegister) {
+      onOpenRegister()
+    } else {
+      document.querySelector('#register')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   const units = [['days', 'Days'], ['hours', 'Hours'], ['minutes', 'Minutes'], ['seconds', 'Seconds']]
 
   return (
@@ -75,23 +84,22 @@ export default function Hero() {
       <div className="hero-cliffs hero-cliffs--far" /><div className="hero-cliffs hero-cliffs--near" />
       <div className="stone-pedestal" />
       <Suspense fallback={<div className="stone-fallback" aria-hidden="true"><i /></div>}><SoulStoneScene /></Suspense>
-      <div className="stone-interaction-hint"><Rotate3D size={13} /> DRAG TO ROTATE</div>
       <div className="soul soul--one" /><div className="soul soul--two" /><div className="soul soul--three" />
-      <p className="edge-copy edge-copy--left">IN A<br />DIGITAL REALM,<br />EVERY FLAG<br /><em>HOLDS A SOUL</em></p>
-      <p className="edge-copy edge-copy--right">SOME<br />CHALLENGES<br />COST MORE<br />THAN JUST<br /><em>SKILLS</em></p>
       <div className="hero-content">
         <div className="eyebrow"><span /> OWASP PCCOE PRESENTS <span /></div>
         <h1><span>ByteMe</span> <strong>CTF</strong></h1>
-        <p className="hero-tagline">TRAP THE FLAG. <i>FREE THE SOUL.</i></p>
-        <div className="countdown" aria-label={EVENT_DATE.startsWith('[') ? 'Example countdown values' : 'Event countdown'}>
-          {units.map(([key, label]) => <div className="time-block" key={key}><b>{time[key]}</b><span>{label}</span></div>)}
+        <div className="countdown" aria-label="Event countdown to launch">
+          {units.map(([key, label]) => (
+            <div className="time-block" key={key}>
+              <b>{time[key]}</b>
+              <span>{label}</span>
+            </div>
+          ))}
         </div>
-        <MagneticButton className="hero-cta" onClick={scrollToRegister}>REGISTER NOW <ArrowUpRight size={17} /></MagneticButton>
       </div>
-      <div className="hero-bottom-labels"><span>FIND</span><i /><span>SOLVE</span><i /><span>RECLAIM</span></div>
-      <button className="scroll-cue" onClick={() => document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' })} aria-label="Scroll to explore"><Mouse size={19} /><small>SCROLL TO EXPLORE</small><ArrowDown size={14} /></button>
     </section>
   )
 }
 
 export { MagneticButton }
+

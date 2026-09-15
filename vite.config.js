@@ -15,23 +15,26 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.warn', 'console.info'],
         passes: 2,
       },
       mangle: { safari10: true },
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Isolate Three.js ecosystem (largest deps)
-          'vendor-three': ['three'],
-          'vendor-r3f': ['@react-three/fiber', '@react-three/drei', '@react-three/postprocessing', 'postprocessing'],
-          // React core
-          'vendor-react': ['react', 'react-dom'],
-          // UI utilities
-          'vendor-ui': ['animejs', 'lucide-react'],
+        manualChunks(id) {
+          if (id.includes('node_modules/three')) {
+            return 'vendor-three'
+          }
+          if (id.includes('node_modules/@react-three') || id.includes('node_modules/postprocessing')) {
+            return 'vendor-r3f'
+          }
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'vendor-react'
+          }
+          if (id.includes('node_modules/animejs') || id.includes('node_modules/lucide-react')) {
+            return 'vendor-ui'
+          }
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
@@ -50,8 +53,7 @@ export default defineConfig({
     // Inline assets smaller than 4 KB
     assetsInlineLimit: 4096,
     sourcemap: false,
-    // Warn on chunks larger than 600 KB
-    chunkSizeWarningLimit: 600,
+    // Warn on chunks larger than 800 KB (accounting for Three.js bundle)
+    chunkSizeWarningLimit: 800,
   },
 })
-

@@ -83,6 +83,11 @@ export default function SoulCursor() {
 
       ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2)
       ctx.fillStyle = 'rgba(255,255,240,0.95)'; ctx.fill()
+
+      ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2)
+      ctx.strokeStyle = 'rgba(255, 160, 40, 0.5)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke()
     }
 
     function drawParticle(p) {

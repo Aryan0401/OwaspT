@@ -1,47 +1,128 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
+import SoulCursor from './components/SoulCursor'
+import RulesModal from './components/RulesModal'
+import RegistrationModal from './components/RegistrationModal'
 import { useScrollReveal } from './hooks/useScrollReveal'
 
-// Lazy-load everything below the fold
-const About    = lazy(() => import('./components/About'))
-const Lore     = lazy(() => import('./components/Lore'))
-const Tracks   = lazy(() => import('./components/Tracks'))
-const Timeline = lazy(() => import('./components/Timeline'))
-const Prizes   = lazy(() => import('./components/Prizes'))
-const FAQ      = lazy(() => import('./components/FAQ'))
-const Register = lazy(() => import('./components/Register'))
-const Sponsors = lazy(() => import('./components/Sponsors'))
-const Footer   = lazy(() => import('./components/Footer'))
-
+// Lazy-load below-the-fold content
+const About      = lazy(() => import('./components/About'))
+const Tracks     = lazy(() => import('./components/Tracks'))
+const Timeline   = lazy(() => import('./components/Timeline'))
+const Prizes     = lazy(() => import('./components/Prizes'))
+const Register   = lazy(() => import('./components/Register'))
+const Sponsors   = lazy(() => import('./components/Sponsors'))
+const Footer     = lazy(() => import('./components/Footer'))
 
 function Cursor() {
-  const [enabled] = useState(() => typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches)
+  const [enabled, setEnabled] = useState(false)
+
   useEffect(() => {
-    if (!enabled) return undefined
+    const isPointerFine = window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches
+    setEnabled(isPointerFine)
+
+    if (!isPointerFine) return undefined
+
     const dot = document.querySelector('.cursor-dot')
     const ring = document.querySelector('.cursor-ring')
-    let x = -100; let y = -100; let ringX = -100; let ringY = -100; let frame
-    const move = (event) => { x = event.clientX; y = event.clientY; dot.style.transform = `translate3d(${x}px, ${y}px, 0)` }
-    const animate = () => { ringX += (x - ringX) * 0.16; ringY += (y - ringY) * 0.16; ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`; frame = requestAnimationFrame(animate) }
-    window.addEventListener('pointermove', move); animate()
-    return () => { window.removeEventListener('pointermove', move); cancelAnimationFrame(frame) }
-  }, [enabled])
-  return enabled ? <><span className="cursor-dot" /><span className="cursor-ring" /></> : null
+    if (!dot || !ring) return undefined
+
+    let x = -100
+    let y = -100
+    let ringX = -100
+    let ringY = -100
+    let frame
+
+    const move = (event) => {
+      x = event.clientX
+      y = event.clientY
+      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`
+    }
+
+    const animate = () => {
+      ringX += (x - ringX) * 0.18
+      ringY += (y - ringY) * 0.18
+      ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`
+      frame = requestAnimationFrame(animate)
+    }
+
+    window.addEventListener('pointermove', move)
+    animate()
+
+    return () => {
+      window.removeEventListener('pointermove', move)
+      cancelAnimationFrame(frame)
+    }
+  }, [])
+
+  return enabled ? (
+    <>
+      <span className="cursor-dot" />
+      <span className="cursor-ring" />
+      <SoulCursor />
+    </>
+  ) : null
 }
 
 export default function App() {
   useScrollReveal()
-  return <>
-    <Cursor />
-    <div className="grain" />
-    <Navbar />
-    <main>
-      <Hero />
+
+  const [rulesOpen, setRulesOpen] = useState(false)
+  const [registerOpen, setRegisterOpen] = useState(false)
+
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname)
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
+
+  const handleOpenRegister = () => setRegisterOpen(true)
+  const handleOpenRules = () => setRulesOpen(true)
+
+  return (
+    <>
+      <Cursor />
+      <div className="grain" />
+      
+      <Navbar
+        onOpenRegister={handleOpenRegister}
+        onOpenRules={handleOpenRules}
+      />
+
+      <main>
+        <Hero
+          onOpenRegister={handleOpenRegister}
+          onOpenRules={handleOpenRules}
+        />
+
+        <Suspense fallback={<div className="section-loader" />}>
+          <About />
+          <Tracks />
+          <Timeline />
+          <Prizes />
+          <Register onOpenRegister={handleOpenRegister} />
+          <Sponsors />
+        </Suspense>
+      </main>
+
       <Suspense fallback={null}>
-        <About /><Lore /><Tracks /><Timeline /><Prizes /><FAQ /><Register /><Sponsors />
+        <Footer onOpenRules={handleOpenRules} />
       </Suspense>
-    </main>
-    <Suspense fallback={null}><Footer /></Suspense>
-  </>
+
+      <RulesModal
+        isOpen={rulesOpen}
+        onClose={() => setRulesOpen(false)}
+      />
+
+      <RegistrationModal
+        isOpen={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+      />
+    </>
+  )
 }

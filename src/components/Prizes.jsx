@@ -1,3 +1,120 @@
-const medals = [['01', 'CHAMPION', 'THE FIRST TO RECLAIM'], ['02', 'RUNNER UP', 'THE SECOND TO AWAKEN'], ['03', 'THIRD PLACE', 'THE FINAL ASCENT']]
-const awards = ['BEST WRITEUP', 'BEST BEGINNER TEAM', 'BEST OSINT SOLVER', 'MOST CREATIVE SOLUTION']
-export default function Prizes() { return <section id="prizes" className="prizes section-shell"><div className="prize-heading reveal"><div className="section-kicker">05 / THE RECKONING</div><h2>CLAIM YOUR<br /><em>REWARD</em></h2></div><div className="prize-grid">{medals.map(([number, title, tag], index) => <article className={`prize-card prize-card--${index + 1} reveal`} key={title}><span>{number}</span><div className="prize-crystal" /><h3>{title}</h3><p>{tag}</p><b>[PLACEHOLDER]</b></article>)}</div><div className="awards reveal">{awards.map((award) => <span key={award}>{award}</span>)}</div></section> }
+import { Trophy, Medal, Award, Gift, Shirt, Star, Users, Crown, Gem, Sparkles } from 'lucide-react'
+
+const medals = [
+  {
+    place: '02',
+    tier: 'SILVER',
+    title: 'RUNNER UP',
+    tag: 'THE SECOND TO AWAKEN',
+    cash: '₹25,000',
+    icon: Medal,
+    footerText: 'SOLVE · LEARN · RECLAIM',
+    perks: [
+      { text: '6-Month HTB VIP Vouchers', icon: Gift },
+      { text: 'Silver Relic Trophy', icon: Trophy },
+      { text: 'OWASP PCCOE Merch Kit', icon: Shirt },
+      { text: 'Exclusive Hall of Fame Slot', icon: Star },
+    ],
+  },
+  {
+    place: '01',
+    tier: 'GOLD',
+    title: 'CHAMPION',
+    tag: 'THE APEX RECLAIMER',
+    cash: '₹35,000',
+    icon: Crown,
+    footerText: 'LEGENDS · SOLVE · RECLAIM',
+    perks: [
+      { text: '1-Year HTB VIP+ Subscriptions', icon: Crown },
+      { text: 'Golden Soul Relic Trophy', icon: Gem },
+      { text: 'VIP Swag Box & Stickers', icon: Gift },
+      { text: 'Interview Fast-track with Sponsors', icon: Users },
+    ],
+  },
+  {
+    place: '03',
+    tier: 'BRONZE',
+    title: 'THIRD PLACE',
+    tag: 'THE FINAL ASCENT',
+    cash: '₹15,000',
+    icon: Award,
+    footerText: 'PERSIST · SOLVE · RISE',
+    perks: [
+      { text: '3-Month HTB VIP Vouchers', icon: Gift },
+      { text: 'Bronze Relic Trophy', icon: Trophy },
+      { text: 'OWASP PCCOE Merch Kit', icon: Shirt },
+      { text: 'Hall of Fame Feature', icon: Star },
+    ],
+  },
+]
+
+export default function Prizes() {
+  return (
+    <section id="prizes" className="prizes section-shell">
+      <div className="prize-heading reveal">
+        <div className="section-kicker">04 / THE RECKONING</div>
+        <h2>CLAIM YOUR<br /><em>REWARD</em></h2>
+        <p className="prize-sub">
+          ₹75,000 in cash bounties, certifications, and premium security subscriptions await the sharpest minds.
+        </p>
+      </div>
+
+      <div className="prize-grid">
+        {medals.map((medal) => {
+          const IconComponent = medal.icon
+          const isChampion = medal.place === '01'
+
+          return (
+            <article
+              className={`prize-card prize-card--${isChampion ? '1' : medal.place === '02' ? '2' : '3'} reveal`}
+              key={medal.title}
+            >
+              {/* Corner brackets */}
+              <span className="card-bracket card-bracket--tl" aria-hidden="true" />
+              <span className="card-bracket card-bracket--br" aria-hidden="true" />
+
+              <div className="prize-card-header">
+                <span className="prize-rank">RANK // {medal.place}</span>
+                <span className={`prize-tier-badge prize-tier-badge--${medal.tier.toLowerCase()}`}>
+                  {medal.tier} DIVISION <Sparkles size={10} style={{ marginLeft: 4 }} />
+                </span>
+              </div>
+
+              {/* High-Tech Cyber Trophy Emblem */}
+              <div className={`prize-emblem-wrap prize-emblem--${medal.tier.toLowerCase()}`}>
+                <div className="prize-emblem-line" />
+                <div className="prize-emblem-glow" aria-hidden="true" />
+                <div className="prize-emblem-ring">
+                  <div className="prize-emblem-inner">
+                    <IconComponent size={isChampion ? 40 : 34} />
+                  </div>
+                </div>
+                <div className="prize-emblem-line" />
+              </div>
+
+              <h3>{medal.title}</h3>
+              <p className="prize-tag">{medal.tag}</p>
+              <div className="prize-cash">{medal.cash}</div>
+              <div className="prize-divider" />
+
+              <ul className="prize-perks-list">
+                {medal.perks.map((perk) => {
+                  const PerkIcon = perk.icon
+                  return (
+                    <li key={perk.text}>
+                      <PerkIcon size={16} /> <span>{perk.text}</span>
+                    </li>
+                  )
+                })}
+              </ul>
+
+              <div className="prize-footer-text">
+                {medal.footerText}
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </section>
+  )
+}

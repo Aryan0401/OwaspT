@@ -1,7 +1,7 @@
 import { Sparkles, useTexture } from '@react-three/drei'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
-import { Suspense, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
 
@@ -91,12 +91,22 @@ function Fragments() {
   ))
 }
 
-function StoneAssembly({ reducedMotion }) {
+function StoneAssembly({ reducedMotion, scale = 0.82, activeShard }) {
   const root = useRef()
   const targetRotation = useRef(new THREE.Euler(0.08, -0.35, 0))
   const lastPointer = useRef([0, 0])
   const dragging = useRef(false)
   const geometry = useMemo(makeCrystalGeometry, [])
+
+  // Smoothly rotate stone to present facet when activeShard changes
+  const prevShard = useRef(activeShard)
+  useEffect(() => {
+    if (activeShard !== undefined && prevShard.current !== activeShard) {
+      const diff = activeShard - (prevShard.current ?? 0)
+      prevShard.current = activeShard
+      targetRotation.current.y += diff * 0.85 + 0.4
+    }
+  }, [activeShard])
 
   const onPointerDown = (event) => {
     if (reducedMotion) return
@@ -129,17 +139,17 @@ function StoneAssembly({ reducedMotion }) {
   })
 
   return (
-    <group ref={root} scale={0.82}>
+    <group ref={root} scale={scale}>
       <Crystal geometry={geometry} handlers={handlers} />
       <Fragments />
     </group>
   )
 }
 
-function Scene({ reducedMotion }) {
+function Scene({ reducedMotion, scale = 0.82, activeShard }) {
   return <>
     <ambientLight color="#ffe8b8" intensity={0.32} />
-    <StoneAssembly reducedMotion={reducedMotion} />
+    <StoneAssembly reducedMotion={reducedMotion} scale={scale} activeShard={activeShard} />
     <Sparkles count={reducedMotion ? 35 : 118} scale={[6, 6, 3]} size={2.05} speed={reducedMotion ? 0 : 0.2} color="#FFD166" opacity={0.75} />
     <EffectComposer>
       <Bloom intensity={1.45} luminanceThreshold={0.35} mipmapBlur />
@@ -148,14 +158,13 @@ function Scene({ reducedMotion }) {
   </>
 }
 
-export default function SoulStoneScene() {
+export default function SoulStoneScene({ className = 'scene', scale = 0.82, activeShard }) {
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   return (
-    <div className="scene" role="application" aria-label="Interactive glowing crystal. Drag the stone to rotate it.">
+    <div className={className} role="application" aria-label="Interactive glowing crystal. Drag the stone to rotate it.">
       <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0.1, 6.15], fov: 39 }} gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}>
-        <Suspense fallback={null}><Scene reducedMotion={reducedMotion} /></Suspense>
+        <Suspense fallback={null}><Scene reducedMotion={reducedMotion} scale={scale} activeShard={activeShard} /></Suspense>
       </Canvas>
     </div>
   )
 }
-
